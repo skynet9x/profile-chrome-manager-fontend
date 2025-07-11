@@ -1,0 +1,67 @@
+.sidebar {
+    background-color: hsl(225deg 90% 7.84%);
+    a.sidebar__logo {
+        background-color: hsl(225deg 90% 7.84%) !important;
+    }
+
+    .activePage {
+      .sidebar-menu {
+        &__link {
+            color: hsl(var(--main));
+            background-color: var(--main-50);
+            &::before {
+                color: hsl(var(--white)) !important;
+                transform: translateY(-50%) rotate(90deg) !important;
+            }
+            .link-badge {
+                background-color: hsl(var(--white));
+                color: var(--main-600);
+            }
+        }
+      }
+    }
+}
+
+.table {
+    tbody {
+        .text-password:hover {
+            display: block;
+            cursor: pointer;
+        }
+    }
+}
+
+.search_form {
+    min-width: 1000px;
+}
+
+span[lable-status] {
+    color: #a5a2a0 !important;
+}
+
+span[lable-status="live"] {
+    color: #00ff5ae0 !important;
+}
+
+span[lable-status="error_timeout_captcha"] {
+    color: #ff8d00 !important;
+}
+
+span[lable-status="none"] {
+    color: #a5a2a0 !important;
+}
+
+span[lable-status="wrong_password"] {
+    color: #df7c3a !important;
+}
+
+span[lable-status="pending"] {
+    color: #348bb5 !important;
+}
+
+._code {
+    background-color: #000;
+    color: #90c782;
+    width: 300px;
+}
+
