@@ -11,7 +11,14 @@ function App() {
   return (
     <BrowserRouter>
       <AppRoutes />
-      <ToastContainer />
+      <ToastContainer 
+        autoClose={3000}
+        hideProgressBar={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        pauseOnHover
+      />
     </BrowserRouter>
   );
 }

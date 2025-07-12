@@ -45,7 +45,7 @@ function GmailPage() {
     const [query_ags_status, setQuerySearchStatus] = useState("")
     const [query_ags_utm_source, setQuerySearchUtmsource] = useState("")
 
-    const [scheduler_action, setFrom_scheduler_action] = useState("")
+    const [scheduler_action, setFrom_scheduler_action] = useState("login_gmail")
     const [scheduler_date_type, setFrom_scheduler_date_type] = useState("fixed")
     const [scheduler_date_fixed, setFrom_scheduler_date_fixed] = useState(moment().tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"))
     const [scheduler_date_delay, setFrom_scheduler_date_delay] = useState(600)
@@ -230,7 +230,32 @@ function GmailPage() {
         if (res.status == 200) {
 			toast.success("Done new Task")
 		}
-    }
+    };
+
+    var handle_on_delete = async (e) => {
+        let id = $(e.target).attr("data-id");
+		let index = $(e.target).attr("data-index");
+        const res = await axiosClient({
+            method: 'DELETE',
+            url: `/email/${id}`
+        });
+
+        if (res.status == 400) {
+			setError(res.response.data)
+			toast.error("delete fail")
+		};
+
+        if (res.status == 200) {
+			toast.success("delete complete");
+			setEmails((pevtasks) => pevtasks.filter((_, i) => i != index));
+		};
+    };
+
+    useEffect(() => {
+        setError(null);
+        getLableStatus();
+        getData();
+    }, [page, query_ags_email, query_ags_status, query_ags_utm_source]);
 
     useEffect(() => {
         setError(null);
@@ -336,7 +361,7 @@ function GmailPage() {
                                                     <i class="ph ph-calendar-plus"></i>
                                                 </button>
 
-                                                <button type="button" class="list-view-btn text-warning-600 text-2xl" title="Clear task runing">
+                                                <button type="button" class="list-view-btn text-warning-600 text-2xl" title="reload" onClick={getData}>
                                                     <i class="ph  ph-arrows-counter-clockwise"></i>
                                                 </button>
                                                  
@@ -369,7 +394,7 @@ function GmailPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {emails.map((item) => (
+                                    {emails.map((item, index) => (
                                         <tr>
                                             <td class="fixed-width">
                                                 <div class="form-check">
@@ -405,12 +430,10 @@ function GmailPage() {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button type="button" class="list-view-btn text-warning-600  border rounded-pill m-2  p-5" title="Clear task runing">
-                                                    <i class="ph  ph-arrows-counter-clockwise"></i>
+                                                <button type="button" class="list-view-btn text-warning-600  border rounded-pill m-2  p-5 ph  ph-arrows-counter-clockwise" title="Clear task runing">
                                                 </button>
                                                  
-                                                <button type="button" class="grid-view-btn text-danger-600  border rounded-pill m-2 p-5" title="Remove this email">
-                                                    <i class="ph ph-trash"></i>
+                                                <button type="button" class="grid-view-btn text-danger-600  border rounded-pill m-2 p-5 ph ph-trash" data-id={item.id} data-index={index}  title="Remove this email" onClick={handle_on_delete}>
                                                 </button>
                                             </td>
                                         </tr>
@@ -424,7 +447,6 @@ function GmailPage() {
                                 <li class="page-item">
                                     <button class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium" onClick={ (e) => {
                                         ( ( page > 1  ) ? setPage(page-1)  : setPage(page))
-                                        handle_search_query(e)
                                     } } ><i class="ph ph-arrow-left"></i></button>
                                 </li>
                                 <li class="page-item active">
@@ -434,7 +456,6 @@ function GmailPage() {
                                 <li class="page-item">
                                     <button class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium" onClick={ (e) => {
                                         setPage(page+1)
-                                        handle_search_query(e)
                                     } } ><i class="ph ph-arrow-right"></i></button>
                                 </li>
                             </ul>
