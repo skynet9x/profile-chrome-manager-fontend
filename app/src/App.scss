@@ -66,3 +66,12 @@ span[lable-status="pending"] {
     width: 300px;
 }
 
+.text-tag {
+    border: 1px solid #ddd;
+    background-color: hsla(0, 1%, 23%, 0.733);
+    color: #FFF;
+    border-radius: 10px;
+    padding: 2px; margin: 2px;
+    display: block;
+    text-align: center;
+}

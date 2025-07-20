@@ -29,7 +29,7 @@ function ModalTask(props) {
 									<div class="col-12">
 										<div class="row g-20">
 											<div class="col-sm-12">
-												<label for="courseTitle" class="h5 mb-8 fw-semibold font-heading">Selected Email <span class="text-13 text-gray-400 fw-medium">(Required)</span> </label>
+												<label for="courseTitle" class="h5 mb-8 fw-semibold font-heading">Selected Items <span class="text-13 text-gray-400 fw-medium">(Required)</span> </label>
 												<div class="position-relative">
 													<input type="text" disabled class="text-counter placeholder-13 form-control py-11 pe-76" maxlength="100" id="courseTitle" placeholder="selected Items" />
 													<div class="text-gray-400 position-absolute inset-inline-end-0 top-50 translate-middle-y me-16">
@@ -43,9 +43,10 @@ function ModalTask(props) {
 												<label for="courseLevel" class="h5 mb-8 fw-semibold font-heading">Scheduler action</label>
 												<div class="position-relative">
 													<select class="form-select py-9 placeholder-13 text-15" name="scheduler_action" value={ props.body.scheduler_action } onChange={ props.on_change }>
-														<option value="interact">Interact</option>
-														<option value="login_gmail">Login gmail</option>
-														<option value="load_channel_info">Load channel</option>
+														
+														{props.body.scheduler_action_lable.map((item) => (
+															<option value={item}>{item}</option>
+														))}
 													</select>                                            
 												</div>
 											</div>

@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect } from "react";
 import PrivateRoute from '../components/PrivateRoute'
 import SideBar from '../components/sideBar'
 import TopNavBar from '../components/TopNavBar'
+import ModalTask_channel from '../components/modal/ModalTask_channel'
 
 import axiosClient from "../api/axiosClient";
 import { toast } from "react-toastify";
@@ -29,9 +30,40 @@ function Youtube_channel_page() {
     const [page, setPage] = useState(1);
     const [limitPage, setLimitPage] = useState(50);
 
+    const [query_ags_channel_id, setQuerySearchChannelID] = useState("")
     const [query_ags_email, setQuerySearchEmail] = useState("")
     const [query_ags_status, setQuerySearchStatus] = useState("")
     const [query_ags_utm_source, setQuerySearchUtmsource] = useState("")
+
+    const [scheduler_action, setFrom_scheduler_action] = useState("create_playlist")
+    const [scheduler_date_type, setFrom_scheduler_date_type] = useState("fixed")
+    const [scheduler_date_fixed, setFrom_scheduler_date_fixed] = useState(moment().tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"))
+    const [scheduler_date_delay, setFrom_scheduler_date_delay] = useState(600)
+    const [scheduler_date_range_min, setFrom_scheduler_date_range_min] = useState(0)
+    const [scheduler_date_range_max, setFrom_scheduler_date_range_max] = useState(86400 - 1)
+    const [keyword_groups, setFrom_keyword_groups] = useState([])
+    const [keyword_use, setFrom_keyword_use] = useState("")
+    const [video_append_id, set_video_append_id] = useState("")
+
+    const scheduler_action_lable = [
+        "upload_video", "live_stream", "list_stream_stop", "create_playlist", "remove_playlist", "update_playlist"
+    ]
+
+    var get_keyword_groups = async (e) => {
+        const res = await axiosClient({
+            method: 'GET',
+            url: '/youtube/keyword/group'
+        });
+
+        if (res.status == 400) {
+			setError(res.response.data)
+		};
+
+        if (res.status == 200) {
+			setFrom_keyword_groups(res.data.items)
+            setFrom_keyword_use(res.data.items[0].group)
+		}
+    };
 
     var handle_search_query = async (e) => {
         if (e && e.preventDefault) {
@@ -43,7 +75,8 @@ function Youtube_channel_page() {
             limit: limitPage,
             email: query_ags_email,
             status: query_ags_status,
-            utm_source: query_ags_utm_source
+            utm_source: query_ags_utm_source,
+            channel_id: query_ags_channel_id
         }).toString();
 
         const res = await axiosClient({
@@ -62,8 +95,117 @@ function Youtube_channel_page() {
 
         $('#selectAll').on('change', function () {
             $('.form-check .form-check-input').prop('checked', $(this).prop('checked')); 
-        }); 
+        });
     };
+
+    var handle_Effect_task = (e) => {
+        setIds([]);
+        let temp = [];
+        $('tbody .form-check .form-check-input:checked').map((index, elm) => {
+            temp.push($(elm).val())
+        });
+        setIds(temp);
+        get_keyword_groups()
+        
+        // setFrom_scheduler_date_fixed(moment());
+    };
+
+    var handle_new_task_scheduler = async (e) => {
+        var body = {
+            "ids": ids,
+            "object_model": "gmail",
+            "scheduler_action": "login_gmail",
+            "scheduler_date_type": "fixed",
+            "scheduler_date_fixed": "2025-07-10 11:00:00",
+            "scheduler_date_delay": "",
+            "scheduler_date_range_min": "01:00:00",
+            "scheduler_date_range_max": "20:00:00",
+            "scheduler_data": {
+                "is_proxy": 0,
+                "proxy": {
+                    "host": "",
+                    "type": "http",
+                    "username": "",
+                    "password": ""
+                }
+            }
+        };
+        const res = await axiosClient({
+            method: 'POST',
+            url: '/task/scheduler/new',
+            data: JSON.stringify(body)
+        });
+    };
+
+    var handle_change_form_input = (e) => {
+        let _name = $(e.target).attr("name");
+        switch (_name) {
+            case "scheduler_action":
+                    setFrom_scheduler_action(e.target.value);
+                break;
+            case "scheduler_date_type":
+                    setFrom_scheduler_date_type(e.target.value);
+                break;
+            case "scheduler_date_delay":
+                    setFrom_scheduler_date_delay(e.target.value);
+                break;
+            case "scheduler_date_fixed":
+                    setFrom_scheduler_date_fixed(e.target.value);
+                break;
+            case "scheduler_date_range_min":
+                    setFrom_scheduler_date_range_min(e.target.value);
+                break;
+            case "scheduler_date_range_max":
+                    setFrom_scheduler_date_range_max(e.target.value);
+                break;
+            case "keyword_use":
+                    setFrom_keyword_use(e.target.value)
+                break;
+            case "video_append":
+                    set_video_append_id(e.target.value)
+                break;
+        }
+    };
+
+    var handle_submit_form_task = async (e) => {
+        e.preventDefault(); 
+
+        var body = {
+            ids: ids,
+            "object_model": "youtube_channel",
+            "scheduler_action": scheduler_action,
+            "scheduler_date_type": scheduler_date_type,
+            "scheduler_date_fixed": scheduler_date_fixed,
+            "scheduler_date_range_min": scheduler_date_range_min,
+            "scheduler_date_range_max": scheduler_date_range_max,
+            "scheduler_date_delay": scheduler_date_delay,
+            "scheduler_data": { 
+                "is_proxy": 0,
+                "keyword_use": keyword_use,
+                "video_append_id": video_append_id
+            }
+        }
+
+        const res = await axiosClient({
+            method: 'POST',
+            url: '/task/scheduler/new',
+            data: JSON.stringify(body)
+        });
+
+        if (res.status == 400) {
+			setError(res.response.data)
+            toast.error("new task error")
+		};
+
+        if (res.status == 200) {
+			toast.success("Done new Task")
+		}
+    };
+
+    useEffect(() => {
+        setError(null)
+        handle_search_query()
+    }, [page, query_ags_email, query_ags_status, query_ags_utm_source, query_ags_channel_id]);
 
     useEffect(() => {
         setError(null)
@@ -118,14 +260,20 @@ function Youtube_channel_page() {
                     <div class="card-header border-bottom border-gray-100">
                         <div class="flex-between flex-wrap gap-8">
                             <form action="#" class="row search_form" onSubmit={(e) => { setPage(1); handle_search_query(e) }}>
-                                <div class="col-6">
+                                <div class="col-4">
                                     <div class="position-relative">
                                         <button type="submit" class="input-icon text-xl d-flex text-gray-100 pointer-event-none"><i class="ph ph-magnifying-glass"></i></button> 
                                         <input type="text" class="form-control ps-40 border-transparent focus-border-main-600 bg-main-50 rounded-pill placeholder-15" placeholder="Email..." value={query_ags_email} onChange={(e) => { setQuerySearchEmail(e.target.value) }} />
                                     </div>
                                 </div>
+
+                                <div class="col-4">
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control ps-40 border-transparent focus-border-main-600 bg-main-50 rounded-pill" placeholder="Channel ID..." value={query_ags_channel_id} onChange={(e) => { setQuerySearchChannelID(e.target.value) }} />
+                                    </div>
+                                </div>
                                 
-                                <div class="col-3">
+                                <div class="col-2">
                                         <div class="position-relative">
                                         <select class="form-control ps-100 border-transparent focus-border-main-600 bg-main-50 rounded-pill placeholder-50" onChange={(e) => { setQuerySearchStatus(e.target.value);  }}>
                                             <option value="" disabled="" selected="">Status</option>
@@ -139,7 +287,7 @@ function Youtube_channel_page() {
                                     </div>
                                 </div>
 
-                                <div class="col-3">
+                                <div class="col-2">
                                     <div class="position-relative ">
                                         <input type="text" class="form-control border-transparent focus-border-main-600 bg-main-50 rounded-pill placeholder-15" placeholder="Utm Source..." value={query_ags_utm_source} onChange={(e) => { setQuerySearchUtmsource(e.target.value) }} />
                                     </div>
@@ -150,20 +298,11 @@ function Youtube_channel_page() {
                                 <div class="position-relative text-gray-500 flex-align gap-4 text-13">
                                     <div class="position-relative">
                                         <div class="flex-align gap-8">
-                                            <button type="button" class="list-view-btn text-info-600 text-2xl" title="Implode Form">
-                                                <i class="ph ph-file-code"></i>
-                                            </button>
-
-                                            <button type="button" class="list-view-btn text-info-600 text-2xl" title="Implode File *.csv">
-                                                <i class="ph  ph-file-csv"></i>
-                                            </button>
-                                                
-                                            <button type="button" class="list-view-btn text-warning-600 text-2xl" title="Add Task Scheduler" data-bs-toggle="modal" data-bs-target="#push_task_email">
+                                            <button type="button" class="list-view-btn text-warning-600 text-2xl" title="Add Task Scheduler" onClick={handle_Effect_task} data-bs-toggle="modal" data-bs-target="#push_task_channel">
                                                 <i class="ph ph-calendar-plus"></i>
                                             </button>
 
-                                            <button type="button" class="list-view-btn text-warning-600 text-2xl" title="Clear task runing">
-                                                <i class="ph  ph-arrows-counter-clockwise"></i>
+                                            <button type="button" class="list-view-btn text-warning-600 text-2xl ph  ph-arrows-counter-clockwise" title="reload" onClick={handle_search_query}>
                                             </button>
                                                 
                                             <button type="button" class="grid-view-btn text-danger-600 text-2xl" title="Remove selected email">
@@ -235,12 +374,7 @@ function Youtube_channel_page() {
                                             </span>
                                         </td>
                                         <td>
-                                            <button type="button" class="list-view-btn text-warning-600  border rounded-pill m-2  p-5" title="Clear task runing">
-                                                <i class="ph  ph-arrows-counter-clockwise"></i>
-                                            </button>
-                                                
-                                            <button type="button" class="grid-view-btn text-danger-600  border rounded-pill m-2 p-5" title="Remove this email">
-                                                <i class="ph ph-trash"></i>
+                                            <button type="button" class="list-view-btn text-warning-600  border rounded-pill m-2 p-5 ph  ph-arrows-counter-clockwise" title="Clear task runing">
                                             </button>
                                         </td>
                                     </tr>
@@ -254,7 +388,6 @@ function Youtube_channel_page() {
                             <li class="page-item">
                                 <button class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium" onClick={ (e) => {
                                     ( ( page > 1  ) ? setPage(page-1)  : setPage(page))
-                                    handle_search_query(e)
                                 } } ><i class="ph ph-arrow-left"></i></button>
                             </li>
                             <li class="page-item active">
@@ -264,13 +397,25 @@ function Youtube_channel_page() {
                             <li class="page-item">
                                 <button class="page-link h-44 w-44 flex-center text-15 rounded-8 fw-medium" onClick={ (e) => {
                                     setPage(page+1)
-                                    handle_search_query(e)
                                 } } ><i class="ph ph-arrow-right"></i></button>
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
+            <ModalTask_channel id="push_task_channel" title="Task Channel" body={ {
+                    "ids": ids, 
+                    "scheduler_action": scheduler_action, 
+                    "scheduler_date_type": scheduler_date_type, 
+                    "scheduler_date_delay": scheduler_date_delay,  
+                    "scheduler_date_fixed": scheduler_date_fixed,  
+                    "scheduler_date_range_min": scheduler_date_range_min,  
+                    "scheduler_date_range_max": scheduler_date_range_max,
+                    "scheduler_action_lable": scheduler_action_lable,
+                    "keyword_groups": keyword_groups,
+                    "keyword_use": keyword_use,
+                    "video_append_id": video_append_id
+                } } on_change={handle_change_form_input} on_submit={handle_submit_form_task}/>
 		</div>
 	</PrivateRoute>
   );

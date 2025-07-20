@@ -52,6 +52,9 @@ function GmailPage() {
     const [scheduler_date_range_min, setFrom_scheduler_date_range_min] = useState(0)
     const [scheduler_date_range_max, setFrom_scheduler_date_range_max] = useState(86400 - 1)
 
+    const scheduler_action_lable = [
+        "interact", "login_gmail", "load_channel_info"
+    ]
     var timeToSeconds = (timeStr) => {
         const [h, m, s] = timeStr.split(':').map(Number);
         return h * 3600 + m * 60 + s;
@@ -474,6 +477,7 @@ function GmailPage() {
                     "scheduler_date_fixed": scheduler_date_fixed,  
                     "scheduler_date_range_min": scheduler_date_range_min,  
                     "scheduler_date_range_max": scheduler_date_range_max,
+                    "scheduler_action_lable": scheduler_action_lable
                 } } on_change={handle_change_form_input} on_submit={handle_submit_form_task}/>
         </PrivateRoute>
     );
