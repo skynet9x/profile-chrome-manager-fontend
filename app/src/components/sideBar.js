@@ -58,6 +58,13 @@ function SideBar() {
 						</Link>
 					</li>
 
+					<li className={ (location.pathname == "/youtube/playlist") ? "sidebar-menu__item activePage" : "sidebar-menu__item" }>
+						<Link to="/youtube/playlist" className="sidebar-menu__link">
+							<span class="icon"><i class="ph ph-file-video"></i></span>
+							<span class="text">Youtube playlist</span>
+						</Link>
+					</li>
+
 					<li className={ (location.pathname == "/scheduler") ? "sidebar-menu__item activePage" : "sidebar-menu__item" }>
 						<Link to="/scheduler" className="sidebar-menu__link">
 							<span class="icon"><i class="ph ph-calendar"></i></span>

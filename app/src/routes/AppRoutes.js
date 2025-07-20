@@ -11,6 +11,7 @@ import TaskPage from '../pages/TaskPage'
 import Youtube_channel_page from '../pages/Youtube_channel_page'
 import Youtube_keyword_page from '../pages/youtube_keyword_page';
 import Youtube_video_page from '../pages/Youtube_video_page';
+import Youtube_playlist_page from '../pages/Youtube_playlist_page';
 
 export default function AppRoutes() {
   return (
@@ -21,6 +22,7 @@ export default function AppRoutes() {
 		<Route path="/youtube" element={<Youtube_channel_page />} />
 		<Route path="/youtube/keywords" element={<Youtube_keyword_page />} />
 		<Route path="/youtube/video" element={<Youtube_video_page />} />
+		<Route path="/youtube/playlist" element={<Youtube_playlist_page />} />
 
 		<Route path="/scheduler" element={<TaskschedulerPage />} />
 		<Route path="/tasks" element={<TaskPage />} />
