@@ -98,6 +98,22 @@ function ModalTask_channel(props) {
                                                 </>
                                             ) : "" }
 
+                                            { props.body.scheduler_action == "upload_video" ? (
+                                                <>
+                                                    <div class="col-sm-12">
+                                                        <select class="form-select py-9 placeholder-13 text-15" name="language_code" value={ props.body.language_code } onChange={ props.on_change }>
+                                                            <option value="en">English</option>
+                                                            <option value="vi">Vietnamese</option>
+                                                            <option value="nl">Nederlands</option>
+                                                            <option value="th">Thai</option>
+                                                            <option value="zh-Hans">Chinese Simplified</option>
+                                                            <option value="en">English</option>
+                                                        </select>
+                                                    </div>
+                                                    
+                                                </>
+                                            ) : "" }
+
                                              { props.body.scheduler_action == "create_playlist" ? (
                                                 <>
                                                     <div class="col-sm-6">

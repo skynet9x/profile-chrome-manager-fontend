@@ -44,6 +44,8 @@ function Youtube_channel_page() {
     const [keyword_groups, setFrom_keyword_groups] = useState([])
     const [keyword_use, setFrom_keyword_use] = useState("")
     const [video_append_id, set_video_append_id] = useState("")
+    const [languages, set_languages] = useState({})
+    const [language_code, set_language_code] = useState("en")
 
     const scheduler_action_lable = [
         "upload_video", "live_stream", "list_stream_stop", "create_playlist", "remove_playlist", "update_playlist"
@@ -164,7 +166,21 @@ function Youtube_channel_page() {
             case "video_append":
                     set_video_append_id(e.target.value)
                 break;
+            case "language_code":
+                    set_language_code(e.target.value)
+                break;
         }
+    };
+
+    var handle_load_langue = (e) => {
+        $.ajax({
+            url: "https://api.cognitive.microsofttranslator.com/languages?api-version=3.0",
+            headers: {
+                "Ocp-Apim-Subscription-Key": "61b437a7ee644d939d2f6187c1909918"
+            }
+        }).then((e) => {
+            set_languages(e.translation);
+        });
     };
 
     var handle_submit_form_task = async (e) => {
@@ -182,7 +198,9 @@ function Youtube_channel_page() {
             "scheduler_data": { 
                 "is_proxy": 0,
                 "keyword_use": keyword_use,
-                "video_append_id": video_append_id
+                "video_append_id": video_append_id,
+                "playlist_count": 10,
+                "language_code": language_code
             }
         }
 
@@ -209,7 +227,8 @@ function Youtube_channel_page() {
 
     useEffect(() => {
         setError(null)
-        handle_search_query()
+        handle_search_query();
+        handle_load_langue();
     }, []);
 
   return (
@@ -414,7 +433,9 @@ function Youtube_channel_page() {
                     "scheduler_action_lable": scheduler_action_lable,
                     "keyword_groups": keyword_groups,
                     "keyword_use": keyword_use,
-                    "video_append_id": video_append_id
+                    "video_append_id": video_append_id,
+                    "languages": languages,
+                    "language_code": language_code
                 } } on_change={handle_change_form_input} on_submit={handle_submit_form_task}/>
 		</div>
 	</PrivateRoute>

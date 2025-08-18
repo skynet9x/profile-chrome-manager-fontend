@@ -12,6 +12,7 @@ import Youtube_channel_page from '../pages/Youtube_channel_page'
 import Youtube_keyword_page from '../pages/youtube_keyword_page';
 import Youtube_video_page from '../pages/Youtube_video_page';
 import Youtube_playlist_page from '../pages/Youtube_playlist_page';
+import Google_drive_page from '../pages/google_drive_page';
 
 export default function AppRoutes() {
   return (
@@ -26,6 +27,8 @@ export default function AppRoutes() {
 
 		<Route path="/scheduler" element={<TaskschedulerPage />} />
 		<Route path="/tasks" element={<TaskPage />} />
+
+		<Route path="/drives" element={<Google_drive_page />} />
 
 
 		<Route path="/login" element={<LoginPage />} />
